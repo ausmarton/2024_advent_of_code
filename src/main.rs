@@ -7,14 +7,21 @@ fn main() {
     println!("Advent of Code 2024!");
 
 
-    let input_file = "input/day1/input";
+    let day_1_input_file = "input/day1/input";
 
-    match total_distance(input_file) {
+    match total_distance(day_1_input_file) {
         Ok((distance, similarity)) => {
             println!("Total distance: {}", distance);
             println!("Similarity: {}", similarity)
         },
         Err(e) => eprintln!("Error encountered in file {}",e)
+    }
+
+    let day_2_input_file = "input/day2/input";
+
+    match count_safe_reports(day_2_input_file) {
+        Ok(count) => println!("Safe reports: {}", count),
+        Err(e) => eprintln!("Error encountered in file {}", e)
     }
 }
 
@@ -61,6 +68,24 @@ fn total_distance(file_path: &str) -> io::Result<(i32, i32)> {
     Ok((total_distance, similarity_score))
 }
 
+//day 2 - part 1
+fn count_safe_reports(file_path: &str) -> io::Result<usize> {
+    match read_lines(file_path) {
+        Ok(lines) => Ok(lines.filter_map(Result::ok)
+                        .map(|line| line.split_whitespace()
+                        .filter_map(|s| s.parse::<i32>().ok()).collect())
+                        .filter(|report| is_safe_report(report)).count()),
+        Err(e) => Err(e)
+
+    }
+}
+
+fn is_safe_report(report: &Vec<i32>) -> bool {
+    report.windows(2)
+        .all(|w| w[0] < w[1] && (w[0]+4) > w[1]) ||
+        report.windows(2)
+            .all(|w| w[0] > w[1] && (w[0]-4) < w[1])
+}
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
