@@ -23,4 +23,11 @@ fn main() {
         Ok(count) => println!("Safe Dampened reports: {}", count),
         Err(e) => eprintln!("Error encountered in file {}", e)
     }
+
+    let day_3_input_file = "input/day3/input";
+
+    match advent_of_code_2024::day3::cleanse_and_evaluate_expression(day_3_input_file) {
+        Ok(sum) => println!("Sum of all muls: {}", sum),
+        Err(e) => eprintln!("Error encountered in file {}", e)
+    }
 }
