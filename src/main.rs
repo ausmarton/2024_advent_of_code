@@ -35,4 +35,12 @@ fn main() {
         Ok(sum) => println!("Sum of all muls (filtered): {}", sum),
         Err(e) => eprintln!("Error encountered in file {}", e)
     }
+
+    let day_4_input_file = "input/day4/input";
+
+    match advent_of_code_2024::day4::count_occurences_in_text(day_4_input_file) {
+        Ok(count) => println!("Occurences of XMAS: {}", count),
+        Err(e) => eprintln!("Error encountered in file {}", e)
+    }
+
 }
