@@ -43,4 +43,9 @@ fn main() {
         Err(e) => eprintln!("Error encountered in file {}", e)
     }
 
+    match advent_of_code_2024::day4::count_x_of_mas_occurences_in_file(day_4_input_file) {
+        Ok(count) => println!("Occurences of X-MAS: {}", count),
+        Err(e) => eprintln!("Error encountered in file {}", e)
+    }
+
 }

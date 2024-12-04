@@ -13,6 +13,25 @@ pub fn count_occurences_in_text(file_path: &str) -> io::Result<i32> {
     }
 }
 
+pub fn count_x_of_mas_occurences_in_file(file_path: &str) -> io::Result<i32> {
+    match util::read_lines(file_path) {
+        Ok(lines) => {
+                        let text = lines.filter_map(Result::ok)
+                                .collect::<Vec<String>>();
+
+                        Ok(count_x_of_mas(text))
+                    },
+        Err(e)    => Err(e)
+    }
+}
+
+fn count_x_of_mas(text: Vec<String>) -> i32 {
+    extract_windows(text, 3)
+    .iter()
+    .filter(|w| contains_x_mas(w.to_vec()))
+    .count() as i32
+}
+
 fn full_search(text: Vec<String>) -> i32 {
     let horizontal = count_occurrences(&text);
     let matrix = to_matrix(&text);
@@ -109,6 +128,38 @@ fn count_occurrences(block: &Vec<String>) -> i32 {
     .sum::<i32>()
 }
 
+//part 2
+fn extract_windows(text: Vec<String>, window_size: usize) -> Vec<Vec<String>> {
+    
+    let height = text.len();
+    let width = text[0].len();
+
+    let mut windows: Vec<Vec<String>> = Vec::new();
+
+    for row in 0..=(height-window_size) {
+        for column in 0..=(width-window_size) {
+            let mut window: Vec<String> = Vec::new();
+            
+            for i in 0..window_size {
+                window.push(text[column+i][row..row+window_size].to_string());
+            }
+            windows.push(window);
+        }
+    }
+
+    windows
+}
+
+fn contains_x_mas(window: Vec<String>) -> bool {
+    let block: Vec<Vec<char>> = window.iter().map(|s| s.chars().collect::<Vec<char>>()).collect();
+    //TODO: check if block is 3x3
+    return block[1][1] == 'A' &&
+        ((block[0][0] == 'M' && block[2][0] == 'M' && block[2][2] == 'S' && block[0][2] == 'S') ||
+        (block[0][0] == 'S' && block[2][0] == 'S' && block[2][2] == 'M' && block[0][2] == 'M') ||
+        (block[0][0] == 'M' && block[2][0] == 'S' && block[2][2] == 'S' && block[0][2] == 'M') ||
+        (block[0][0] == 'S' && block[2][0] == 'M' && block[2][2] == 'M' && block[0][2] == 'S'));
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -149,5 +200,36 @@ mod tests {
         let expected = vec![ "05AF", "16B", "27", "3", "49E", "8D", "C" ];
 
         assert_eq!(extract_diagonals(&to_matrix(&initial)), expected);
+    }
+
+    #[test]
+    fn test_extract_windows() {
+        let initial = to_vec_string(vec![ "0123", "4567", "89AB", "CDEF"]);
+
+        let expected_windows = vec![vec!["01", "45"], vec!["45", "89"], vec!["89", "CD"],
+         vec!["12", "56"], vec!["56", "9A"], vec!["9A", "DE"],
+         vec!["23", "67"], vec!["67", "AB"], vec!["AB", "EF"] ];
+
+        assert_eq!(extract_windows(initial, 2), expected_windows);
+    }
+
+    #[test]
+    fn test_returns_false_when_no_MAS_found() {
+        let initial = to_vec_string(vec!["MAS", "MXS", "SAM"]);
+        assert!(!contains_x_mas(initial));
+    }
+
+    #[test]
+    fn test_returns_true_when_MAS_found() {
+        let initial = to_vec_string(vec!["MXS", "XAX", "MXS"]);
+
+        assert!(contains_x_mas(initial));
+    }
+
+    #[test]
+    fn test_returns_true_when_MAS_found_in_reverse() {
+        let initial = to_vec_string(vec!["SXS", "XAX", "MXM"]);
+
+        assert!(contains_x_mas(initial));
     }
 }
